@@ -1,0 +1,90 @@
+// app config
+apply plugin: 'com.android.application'
+
+android {
+    def camera_folder = 'Camera2_Marshmallow'
+    def compileSdkVersionInt = 23
+    compileSdkVersion compileSdkVersionInt
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        applicationId "com.baby518.marshmallow.camera2"
+        minSdkVersion 23
+        targetSdkVersion 23
+        versionCode getCurrentDate() as int
+        versionName "1.0.3." + getCurrentDate()
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    if (compileSdkVersionInt >= 23) {
+        useLibrary 'org.apache.http.legacy'
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile file(camera_folder + '/AndroidManifest.xml')
+            def src = [
+                    camera_folder + '/src',
+                    camera_folder + '/src_pd',
+                    camera_folder + '/src_pd_gcam',
+                    camera_folder + '/src_plus',
+            ]
+            def resFolder = [
+                    camera_folder + '/res',
+                    camera_folder + '/res_p',
+                    camera_folder + '/res_plus',
+            ]
+            def assetsFolder = [camera_folder + '/assets']
+            def libsFolder = [camera_folder + '/libs']
+
+            java.srcDirs = src
+            resources.srcDirs = src
+            aidl.srcDirs = src
+            renderscript.srcDirs = src
+            res.srcDirs = resFolder
+            assets.srcDirs = assetsFolder
+//            jni.srcDirs = ['jni']
+            jniLibs.srcDirs = libsFolder
+        }
+
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
+    }
+}
+
+dependencies {
+    provided files(getLayoutLibPath())
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':framework_ex')
+    compile 'com.android.support:support-v4:24.0.0'
+    compile 'com.google.code.findbugs:jsr305:3.0.0'
+    compile 'com.google.guava:guava:19.0-rc2'
+    compile 'com.github.bumptech.glide:glide:3.6.1'
+    compile 'com.adobe.xmp:xmpcore:5.1.2'
+}
+
+def getCurrentDate() {
+    def now = new Date().format('yyyyMMddHH');
+    return now;
+}
+
+// must called after "android" definition
+def getLayoutLibPath() {
+    def rootDir;
+    rootDir = "${android.getSdkDirectory().getAbsolutePath()}" + "/platforms/" + android.compileSdkVersion + "/data/layoutlib.jar"
+    Console.println(rootDir)
+    return rootDir
+}
+
+// must called after "android" definition
+def getRenderscriptLibPath() {
+    def rootDir;
+    rootDir = "${android.getSdkDirectory().getAbsolutePath()}" + "/build-tools/" + android.buildToolsVersion + "/renderscript/lib/renderscript-v8.jar"
+    Console.println(rootDir)
+    return rootDir
+}

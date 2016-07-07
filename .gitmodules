@@ -1,0 +1,6 @@
+[submodule "app/Camera2_Marshmallow"]
+	path = app/Camera2_Marshmallow
+	url = git@github.com:baby518/Camera2_Marshmallow.git
+[submodule "framework_ex/frameworks_ex"]
+	path = framework_ex/frameworks_ex
+	url = git@github.com:baby518/android_frameworks_ex.git
