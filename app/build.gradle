@@ -5,7 +5,7 @@ android {
     def camera_folder = 'Camera2'
     def compileSdkVersionInt = 25
     compileSdkVersion compileSdkVersionInt
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.1"
 
     defaultConfig {
         applicationId "com.baby518.camera2"
