@@ -5,7 +5,7 @@ android {
     def camera_folder = 'Camera2'
     def compileSdkVersionInt = 25
     compileSdkVersion compileSdkVersionInt
-    buildToolsVersion "25.0.1"
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         applicationId "com.baby518.camera2"
@@ -58,33 +58,25 @@ android {
 }
 
 dependencies {
-    provided files(getLayoutLibPath())
+    provided files(getLayoutLibPath(android))
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':framework_ex')
-    compile 'com.android.support:support-v4:25.0.0'
+    compile 'com.android.support:support-v4:25.3.1'
     compile 'com.google.code.findbugs:jsr305:3.0.1'
     compile 'com.google.guava:guava:19.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.adobe.xmp:xmpcore:5.1.2'
 }
 
-def getCurrentDate() {
+def static getCurrentDate() {
     def now = new Date().format('yyyyMMddHH');
     return now;
 }
 
 // must called after "android" definition
-def getLayoutLibPath() {
+def static getLayoutLibPath(Object android) {
     def rootDir;
     rootDir = "${android.getSdkDirectory().getAbsolutePath()}" + "/platforms/" + android.compileSdkVersion + "/data/layoutlib.jar"
-    Console.println(rootDir)
-    return rootDir
-}
-
-// must called after "android" definition
-def getRenderscriptLibPath() {
-    def rootDir;
-    rootDir = "${android.getSdkDirectory().getAbsolutePath()}" + "/build-tools/" + android.buildToolsVersion + "/renderscript/lib/renderscript-v8.jar"
     Console.println(rootDir)
     return rootDir
 }
