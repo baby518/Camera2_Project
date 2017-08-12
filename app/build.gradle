@@ -1,6 +1,13 @@
 // app config
 apply plugin: 'com.android.application'
 
+def AOSP = false
+def USE_API2 = false
+
+// those configs based on AOSP
+def USE_FILMSTRIP =         AOSP ? true : false
+def FORCE_PORTRAIT_SCREEN = AOSP ? false : true
+
 android {
     def camera_folder = 'Camera2'
     def compileSdkVersionInt = 25
@@ -13,6 +20,11 @@ android {
         targetSdkVersion 25
         versionCode getCurrentDate() as int
         versionName "1.0.3." + getCurrentDate()
+
+        buildConfigField("boolean", "USE_API2", "${USE_API2}")
+        buildConfigField("boolean", "USE_FILMSTRIP", "${USE_FILMSTRIP}")
+        buildConfigField("boolean", "FORCE_PORTRAIT_SCREEN", "${FORCE_PORTRAIT_SCREEN}")
+        manifestPlaceholders = [SCREEN_ORIENTATION: FORCE_PORTRAIT_SCREEN ? 'portrait' : 'unspecified']
     }
     buildTypes {
         release {
@@ -27,25 +39,38 @@ android {
 
     sourceSets {
         main {
-            manifest.srcFile file(camera_folder + '/AndroidManifest.xml')
-            def src = [
+            if (!AOSP) {
+                manifest.srcFile file(camera_folder + '/src_plus/AndroidManifest.xml')
+            } else {
+                manifest.srcFile file(camera_folder + '/AndroidManifest.xml')
+            }
+            def srcFolder = [
                     camera_folder + '/src',
                     camera_folder + '/src_pd',
                     camera_folder + '/src_pd_gcam',
-                    camera_folder + '/src_plus',
+                    camera_folder + '/config/src',
             ]
+
+            if (!AOSP) {
+                srcFolder = srcFolder + [camera_folder + '/src_plus']
+            }
+
             def resFolder = [
                     camera_folder + '/res',
                     camera_folder + '/res_p',
-                    camera_folder + '/res_plus',
             ]
+
+            if (!AOSP) {
+                resFolder = resFolder + [camera_folder + '/res_plus']
+            }
+
             def assetsFolder = [camera_folder + '/assets']
             def libsFolder = [camera_folder + '/libs']
 
-            java.srcDirs = src
-            resources.srcDirs = src
-            aidl.srcDirs = src
-            renderscript.srcDirs = src
+            java.srcDirs = srcFolder
+            resources.srcDirs = srcFolder
+            aidl.srcDirs = srcFolder
+            renderscript.srcDirs = srcFolder
             res.srcDirs = resFolder
             assets.srcDirs = assetsFolder
 //            jni.srcDirs = ['jni']
