@@ -1,69 +1,62 @@
 // app config
 apply plugin: 'com.android.application'
 
-def AOSP = false
-def USE_API2 = false
+def camera_folder = 'Camera2'
 
-// those configs based on AOSP
-def USE_FILMSTRIP =         AOSP ? true : false
-def FORCE_PORTRAIT_SCREEN = AOSP ? false : true
+def srcFolder = [
+        camera_folder + '/src',
+        camera_folder + '/src_pd',
+        camera_folder + '/src_pd_gcam',
+        camera_folder + '/config/src',
+]
+
+def resFolder = [
+        camera_folder + '/res',
+        camera_folder + '/res_p',
+]
+
+def MANIFEST_REPLACE = false
+def manifestFile = camera_folder + '/AndroidManifest.xml'
+def manifestFileReplace = camera_folder + '/src_plus/AndroidManifest.xml'
 
 android {
-    def camera_folder = 'Camera2'
     def compileSdkVersionInt = 25
     compileSdkVersion compileSdkVersionInt
     buildToolsVersion "25.0.3"
-
     defaultConfig {
         applicationId "com.baby518.camera2"
         minSdkVersion 23
         targetSdkVersion 25
         versionCode getCurrentDate() as int
         versionName "1.0.3." + getCurrentDate()
-
-        buildConfigField("boolean", "USE_API2", "${USE_API2}")
-        buildConfigField("boolean", "USE_FILMSTRIP", "${USE_FILMSTRIP}")
-        buildConfigField("boolean", "FORCE_PORTRAIT_SCREEN", "${FORCE_PORTRAIT_SCREEN}")
-        manifestPlaceholders = [SCREEN_ORIENTATION: FORCE_PORTRAIT_SCREEN ? 'portrait' : 'unspecified']
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+    productFlavors {
+        AOSP_ORIG_ {
+            buildConfigField("boolean", "USE_API2", "true")
+            buildConfigField("boolean", "USE_FILMSTRIP", "true")
+            buildConfigField("boolean", "SUPPORT_NAVIGATION_BAR", "false")
+            buildConfigField("boolean", "FORCE_PORTRAIT_SCREEN", "false")
+//            MANIFEST_REPLACE = false
         }
-    }
-
-    if (compileSdkVersionInt >= 23) {
-        useLibrary 'org.apache.http.legacy'
+        PLUS_ {
+            MANIFEST_REPLACE = true
+            def FORCE_PORTRAIT_SCREEN = true
+            buildConfigField("boolean", "USE_API2", "false")
+            buildConfigField("boolean", "USE_FILMSTRIP", "false")
+            buildConfigField("boolean", "SUPPORT_NAVIGATION_BAR", "true")
+            buildConfigField("boolean", "FORCE_PORTRAIT_SCREEN", "${FORCE_PORTRAIT_SCREEN}")
+            manifestPlaceholders = [SCREEN_ORIENTATION: FORCE_PORTRAIT_SCREEN ? 'portrait' : 'unspecified']
+        }
     }
 
     sourceSets {
         main {
-            if (!AOSP) {
-                manifest.srcFile file(camera_folder + '/src_plus/AndroidManifest.xml')
+            if (MANIFEST_REPLACE) {
+                manifest.srcFile file(manifestFileReplace)
             } else {
-                manifest.srcFile file(camera_folder + '/AndroidManifest.xml')
+                manifest.srcFile file(manifestFile)
             }
-            def srcFolder = [
-                    camera_folder + '/src',
-                    camera_folder + '/src_pd',
-                    camera_folder + '/src_pd_gcam',
-                    camera_folder + '/config/src',
-            ]
-
-            if (!AOSP) {
-                srcFolder = srcFolder + [camera_folder + '/src_plus']
-            }
-
-            def resFolder = [
-                    camera_folder + '/res',
-                    camera_folder + '/res_p',
-            ]
-
-            if (!AOSP) {
-                resFolder = resFolder + [camera_folder + '/res_plus']
-            }
-
             def assetsFolder = [camera_folder + '/assets']
             def libsFolder = [camera_folder + '/libs']
 
@@ -77,14 +70,29 @@ android {
             jniLibs.srcDirs = libsFolder
         }
 
+        PLUS_ {
+            java.srcDirs = [camera_folder + '/src_plus']
+            res.srcDirs = [camera_folder + '/res_plus'] + [camera_folder + '/overlay_res']
+        }
+
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    if (compileSdkVersionInt >= 23) {
+        useLibrary 'org.apache.http.legacy'
     }
 }
 
 dependencies {
     provided files(getLayoutLibPath(android))
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':framework_ex')
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.google.code.findbugs:jsr305:3.0.1'
@@ -94,14 +102,12 @@ dependencies {
 }
 
 def static getCurrentDate() {
-    def now = new Date().format('yyyyMMddHH');
-    return now;
+    return new Date().format('yyyyMMddHH')
 }
 
 // must called after "android" definition
 def static getLayoutLibPath(Object android) {
-    def rootDir;
-    rootDir = "${android.getSdkDirectory().getAbsolutePath()}" + "/platforms/" + android.compileSdkVersion + "/data/layoutlib.jar"
+    def rootDir = "${android.getSdkDirectory().getAbsolutePath()}" + "/platforms/" + android.compileSdkVersion + "/data/layoutlib.jar"
     Console.println(rootDir)
     return rootDir
 }
