@@ -20,17 +20,17 @@ def manifestFile = camera_folder + '/AndroidManifest.xml'
 def manifestFileReplace = camera_folder + '/src_plus/AndroidManifest.xml'
 
 android {
-    def compileSdkVersionInt = 25
+    def compileSdkVersionInt = 26
     compileSdkVersion compileSdkVersionInt
-    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "com.baby518.camera2"
         minSdkVersion 23
-        targetSdkVersion 25
+        targetSdkVersion compileSdkVersionInt
         versionCode getCurrentDate() as int
         versionName "1.0.3." + getCurrentDate()
     }
 
+    flavorDimensions "dimen"
     productFlavors {
         AOSP_ORIG_ {
             buildConfigField("boolean", "USE_API2", "true")
@@ -91,14 +91,14 @@ android {
 }
 
 dependencies {
-    provided files(getLayoutLibPath(android))
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':framework_ex')
-    compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.google.code.findbugs:jsr305:3.0.1'
-    compile 'com.google.guava:guava:19.0'
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.adobe.xmp:xmpcore:5.1.2'
+    compileOnly files(getLayoutLibPath(android))
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':framework_ex')
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.google.code.findbugs:jsr305:3.0.1'
+    implementation 'com.google.guava:guava:19.0'
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
+    implementation 'com.adobe.xmp:xmpcore:5.1.2'
 }
 
 def static getCurrentDate() {
