@@ -20,7 +20,7 @@ def manifestFile = camera_folder + '/AndroidManifest.xml'
 def manifestFileReplace = camera_folder + '/src_plus/AndroidManifest.xml'
 
 android {
-    def compileSdkVersionInt = 26
+    def compileSdkVersionInt = 27
     compileSdkVersion compileSdkVersionInt
     defaultConfig {
         applicationId "com.baby518.camera2"
@@ -72,7 +72,8 @@ android {
 
         PLUS_ {
             java.srcDirs = [camera_folder + '/src_plus']
-            res.srcDirs = [camera_folder + '/res_plus'] + [camera_folder + '/overlay_res']
+            // res_plus contain new resources, res_overlay contain overlay resources.
+            res.srcDirs = [camera_folder + '/res_plus'] + [camera_folder + '/res_overlay']
         }
 
         debug.setRoot('build-types/debug')
@@ -94,10 +95,10 @@ dependencies {
     compileOnly files(getLayoutLibPath(android))
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':framework_ex')
-    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.android.support:support-v4:27.0.2'
     implementation 'com.google.code.findbugs:jsr305:3.0.1'
     implementation 'com.google.guava:guava:19.0'
-    implementation 'com.github.bumptech.glide:glide:3.7.0'
+    implementation 'com.github.bumptech.glide:glide:3.8.0'
     implementation 'com.adobe.xmp:xmpcore:5.1.2'
 }
 

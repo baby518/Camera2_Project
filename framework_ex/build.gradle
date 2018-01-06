@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     def folder = 'frameworks_ex/camera2'
-    def compileSdkVersionInt = 26
+    def compileSdkVersionInt = 27
     compileSdkVersion compileSdkVersionInt
 
     defaultConfig {
