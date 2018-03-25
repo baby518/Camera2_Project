@@ -7,6 +7,10 @@
 
 - Use `git submodule update --init --recursive` to update all submodules before your work.
 
+### Compile
+Support 2 product flavors: AOSP_ORIG and PLUS.
+- AOSP_ORIG build aosp source code;
+- PLUS base on aosp source code and fix some bugs, and add some new features.
 
 ### Screen Shot
 ![](screenshot/1.png)
