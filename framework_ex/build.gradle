@@ -1,13 +1,14 @@
 apply plugin: 'com.android.library'
 
+def folder = 'frameworks_ex/camera2'
+def buildInfo = rootProject.ext.buildInfo
+
 android {
-    def folder = 'frameworks_ex/camera2'
-    def compileSdkVersionInt = 27
-    compileSdkVersion compileSdkVersionInt
+    compileSdkVersion buildInfo.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion 23
-        targetSdkVersion compileSdkVersionInt
+        minSdkVersion buildInfo.minSdkVersion
+        targetSdkVersion buildInfo.compileSdkVersion
         versionCode 1
         versionName "1.0"
     }
