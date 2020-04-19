@@ -3,4 +3,4 @@
 	url = git@github.com:baby518/android_frameworks_ex.git
 [submodule "app/Camera2"]
 	path = app/Camera2
-	url = https://github.com/baby518/Camera2_aosp_app.git
+	url = git@github.com:baby518/Camera2_aosp_app.git

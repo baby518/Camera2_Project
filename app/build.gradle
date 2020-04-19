@@ -1,3 +1,6 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 // app config
 apply plugin: 'com.android.application'
 
@@ -15,9 +18,25 @@ def resFolder = [
         camera_folder + '/res_p',
 ]
 
-def MANIFEST_REPLACE = false
 def manifestFile = camera_folder + '/AndroidManifest.xml'
 def manifestFileReplace = camera_folder + '/src_plus/AndroidManifest.xml'
+
+def getCurrentFlavor() {
+    String tskReqStr = getGradle().getStartParameter().getTaskRequests().toString()
+
+    Pattern pattern
+    if (tskReqStr.contains("assemble"))
+        pattern = Pattern.compile("assemble(\\w+)(Release|Debug)")
+    else
+        pattern = Pattern.compile("generate(\\w+)(Release|Debug)")
+
+    Matcher matcher = pattern.matcher(tskReqStr)
+    if (matcher.find()) {
+        return matcher.group(1).toLowerCase()
+    } else {
+        return ""
+    }
+}
 
 def buildInfo = rootProject.ext.buildInfo
 
@@ -39,10 +58,8 @@ android {
             buildConfigField("boolean", "USE_FILMSTRIP", "true")
             buildConfigField("boolean", "SUPPORT_NAVIGATION_BAR", "false")
             buildConfigField("boolean", "FORCE_PORTRAIT_SCREEN", "false")
-//            MANIFEST_REPLACE = false
         }
         PLUS_ {
-            MANIFEST_REPLACE = true
             def FORCE_PORTRAIT_SCREEN = true
             buildConfigField("String", "API_LEVEL", "\"api2\"")
             buildConfigField("boolean", "USE_CAPTURE_MODULE", "false")
@@ -55,7 +72,9 @@ android {
 
     sourceSets {
         main {
-            if (MANIFEST_REPLACE) {
+            def flavor = getCurrentFlavor()
+            println("++++++++++ getCurrentFlavor: " + flavor)
+            if (flavor == "PLUS_") {
                 manifest.srcFile file(manifestFileReplace)
             } else {
                 manifest.srcFile file(manifestFile)
@@ -97,12 +116,16 @@ android {
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     api project(':framework_ex')
+    compileOnly project(':legacy')
     compileOnly files(getLayoutLibPath(android))
-    implementation "com.android.support:support-v4:${buildInfo.androidLibraryVersion}"
-    implementation 'com.google.code.findbugs:jsr305:3.0.1'
+//    implementation "com.android.support:support-v4:${buildInfo.androidLibraryVersion}"
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation 'com.google.guava:guava:19.0'
-    implementation 'com.github.bumptech.glide:glide:3.8.0'
+    api 'com.github.bumptech.glide:glide:3.8.0'
     implementation 'com.adobe.xmp:xmpcore:5.1.2'
+    implementation "androidx.legacy:legacy-support-v4:1.0.0"
+    implementation "androidx.legacy:legacy-support-v13:1.0.0"
+    implementation "androidx.core:core:1.2.0"
 }
 
 def static getCurrentDate() {
