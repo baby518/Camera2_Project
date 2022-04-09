@@ -1,6 +1,3 @@
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 // app config
 apply plugin: 'com.android.application'
 
@@ -17,26 +14,6 @@ def resFolder = [
         camera_folder + '/res',
         camera_folder + '/res_p',
 ]
-
-def manifestFile = camera_folder + '/AndroidManifest.xml'
-def manifestFileReplace = camera_folder + '/src_plus/AndroidManifest.xml'
-
-def getCurrentFlavor() {
-    String tskReqStr = getGradle().getStartParameter().getTaskRequests().toString()
-
-    Pattern pattern
-    if (tskReqStr.contains("assemble"))
-        pattern = Pattern.compile("assemble(\\w+)(Release|Debug)")
-    else
-        pattern = Pattern.compile("generate(\\w+)(Release|Debug)")
-
-    Matcher matcher = pattern.matcher(tskReqStr)
-    if (matcher.find()) {
-        return matcher.group(1).toLowerCase()
-    } else {
-        return ""
-    }
-}
 
 def buildInfo = rootProject.ext.buildInfo
 
@@ -72,13 +49,7 @@ android {
 
     sourceSets {
         main {
-            def flavor = getCurrentFlavor()
-            println("++++++++++ getCurrentFlavor: " + flavor)
-            if (flavor == "PLUS_") {
-                manifest.srcFile file(manifestFileReplace)
-            } else {
-                manifest.srcFile file(manifestFile)
-            }
+            manifest.srcFile 'Camera2/AndroidManifest.xml'
             def assetsFolder = [camera_folder + '/assets']
             def libsFolder = [camera_folder + '/libs']
 
@@ -93,6 +64,7 @@ android {
         }
 
         PLUS_ {
+            manifest.srcFile 'Camera2/src_plus/AndroidManifest.xml'
             java.srcDirs = [camera_folder + '/src_plus']
             // res_plus contain new resources, res_overlay contain overlay resources.
             res.srcDirs = [camera_folder + '/res_plus'] + [camera_folder + '/res_overlay']
@@ -117,15 +89,14 @@ dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     api project(':framework_ex')
     compileOnly project(':legacy')
-    compileOnly files(getLayoutLibPath(android))
-//    implementation "com.android.support:support-v4:${buildInfo.androidLibraryVersion}"
+//    compileOnly files(getLayoutLibPath(android))
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
-    implementation 'com.google.guava:guava:19.0'
+    implementation 'com.google.guava:guava:31.1-android'
     api 'com.github.bumptech.glide:glide:3.8.0'
     implementation 'com.adobe.xmp:xmpcore:5.1.2'
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation "androidx.legacy:legacy-support-v13:1.0.0"
-    implementation "androidx.core:core:1.2.0"
+    implementation "androidx.core:core:1.7.0"
 }
 
 def static getCurrentDate() {
